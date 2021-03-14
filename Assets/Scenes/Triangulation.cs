@@ -5,11 +5,7 @@ using UnityEngine;
 namespace PolygonTool
 {
 
-    #region 耳切法对简单多边形进行三角形化
 
-    /// <summary>
-    /// 判断凹点，凸点，耳朵的比较轴
-    /// </summary>
     public enum CompareAxle
     {
         X,
@@ -147,7 +143,6 @@ namespace PolygonTool
             {
                 _polygonEars.Remove(_concaveVertexs[i]);
             }
-            #endregion
 
             #region 计算耳朵
             List<int> needRemoveIdList = new List<int>();
