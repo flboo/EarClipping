@@ -161,7 +161,7 @@ namespace Delaunay
             return DelaunayHelpers.VisibleLineSegments(_edges);
         }
 
-        public List<LineSegment> DelaunayTriangulation(/*BitmapData keepOutMask = null*/)
+        public List<LineSegment> DelaunayTriange(/*BitmapData keepOutMask = null*/)
         {
             return DelaunayHelpers.DelaunayLinesForEdges(DelaunayHelpers.SelectNonIntersectingEdges(/*keepOutMask,*/_edges));
         }

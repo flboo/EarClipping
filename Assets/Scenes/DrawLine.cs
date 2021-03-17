@@ -5,12 +5,9 @@ using PolygonTool;
 
 public class DrawLine : MonoBehaviour
 {
-    //用物体的坐标来代替点
     public List<Transform> tList;
-    //计算得到的三角形序列下标
     private List<int> resultList = new List<int>();
-
-    private Triangulation triangulation;
+    private Triange Triange;
 
     private void Start()
     {
@@ -20,21 +17,19 @@ public class DrawLine : MonoBehaviour
             posList.Add(tList[i].position);
         }
 
-        triangulation = new Triangulation(posList);
+        Triange = new Triange(posList);
 
-        triangulation.SetCompareAxle(CompareAxle.Y);
+        Triange.SetCompareAxle(CompareAxle.Y);
 
-        int[] a = triangulation.GetTriangles();
+        int[] a = Triange.GetTriangles();
 
         if (a != null)
         {
             for (int i = 0; i < a.Length; i++)
             {
-                Debug.Log("===:" + a[i]);
                 resultList.Add(a[i]);
             }
         }
-
 
         GameObject go = new GameObject();
 
@@ -73,14 +68,9 @@ public class DrawLine : MonoBehaviour
         for (int i = 0; i < tList.Count; i++)
         {
             if (i < tList.Count - 1)
-            {
                 Gizmos.DrawLine(tList[i].position, tList[i + 1].position);
-            }
             else
-            {
                 Gizmos.DrawLine(tList[i].position, tList[0].position);
-            }
-
         }
 
         Gizmos.color = Color.black;

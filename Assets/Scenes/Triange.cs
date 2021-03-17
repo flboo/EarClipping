@@ -13,54 +13,28 @@ namespace PolygonTool
         Z
     }
 
-    /// <summary>
-    /// 对多边形处理
-    /// </summary>
-    public class Triangulation
-    {
 
-        /// <summary>
-        /// 判断凹凸的时候的比对轴
-        /// </summary>
+    public class Triange
+    {
         private CompareAxle _compareAxle = CompareAxle.Y;
 
-        /// <summary>
-        /// 多边形顶点
-        /// </summary>
         private List<Vector3> _polygonVertexs = new List<Vector3>();
 
-        /// <summary>
-        /// 顶点序列
-        /// </summary>
         private List<int> _vertexsSequence = new List<int>();
 
-        /// <summary>
-        /// 节点管理器
-        /// </summary>
         private NodeManager _nodeManager = new NodeManager();
 
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        /// <param name="polygonVertexs">多边形顶点</param>
-        public Triangulation(List<Vector3> polygonVertexs)
+        public Triange(List<Vector3> polygonVertexs)
         {
             this._polygonVertexs = polygonVertexs;
             _nodeManager.Init(polygonVertexs);
         }
 
-        /// <summary>
-        /// 设置比较轴
-        /// </summary>
-        /// <param name="compareAxle"></param>
         public void SetCompareAxle(CompareAxle compareAxle)
         {
             this._compareAxle = compareAxle;
         }
 
-        /// <summary>
-        /// 获取三角形的顶点序列
-        /// </summary>
         public int[] GetTriangles()
         {
             while (_nodeManager.LinkedListLength >= 3)
@@ -82,16 +56,14 @@ namespace PolygonTool
         /// </summary>
         private SplitResult SplitPolygon()
         {
-            //凹点
+            //凹
             List<Node> _concaveVertexs = new List<Node>();
-            //凸点
+            //凸
             List<Node> _raisedVertexs = new List<Node>();
-            //耳朵
+            //耳
             List<Node> _polygonEars = new List<Node>();
             //起始节点
             Node currentNode = _nodeManager.FirstNode;
-
-            #region 计算凹顶点，凸顶点
 
             for (int i = 0; i < _nodeManager.LinkedListLength; i++)
             {
@@ -102,37 +74,25 @@ namespace PolygonTool
                 if (_compareAxle == CompareAxle.Y)
                 {
                     if (crossRes.y > 0)
-                    {
                         _concaveVertexs.Add(currentNode);
-                    }
                     else
-                    {
                         _raisedVertexs.Add(currentNode);
-                    }
                 }
 
                 if (_compareAxle == CompareAxle.X)
                 {
                     if (crossRes.x > 0)
-                    {
                         _concaveVertexs.Add(currentNode);
-                    }
                     else
-                    {
                         _raisedVertexs.Add(currentNode);
-                    }
                 }
 
                 if (_compareAxle == CompareAxle.Z)
                 {
                     if (crossRes.z > 0)
-                    {
                         _concaveVertexs.Add(currentNode);
-                    }
                     else
-                    {
                         _raisedVertexs.Add(currentNode);
-                    }
                 }
 
                 _polygonEars.Add(currentNode);
@@ -144,7 +104,6 @@ namespace PolygonTool
                 _polygonEars.Remove(_concaveVertexs[i]);
             }
 
-            #region 计算耳朵
             List<int> needRemoveIdList = new List<int>();
             for (int i = 0; i < _polygonEars.Count; i++)
             {
@@ -153,7 +112,7 @@ namespace PolygonTool
 
                 while (compareNode != earNode.lastNode)
                 {
-                    bool isIn = IsIn(compareNode.vertex, earNode.lastNode.vertex, earNode.vertex,
+                    bool isIn = IsInTriange(compareNode.vertex, earNode.lastNode.vertex, earNode.vertex,
                         earNode.nextNode.vertex);
 
                     if (isIn == true)
@@ -179,10 +138,6 @@ namespace PolygonTool
                 }
             }
 
-            #endregion
-
-            #region 打印初始化结果
-
             Debug.Log("凸点");
             for (int i = 0; i < _raisedVertexs.Count; i++)
             {
@@ -201,10 +156,6 @@ namespace PolygonTool
                 Debug.Log(_polygonEars[i].id);
             }
 
-            Debug.Log("-----------------------------------------------");
-            #endregion
-
-            //耳朵为空说明不是简单多边形 多边形三角化失败
             if (_polygonEars.Count == 0)
             {
                 return null;
@@ -215,19 +166,10 @@ namespace PolygonTool
             _vertexsSequence.Add(_polygonEars[0].nextNode.id);
             _nodeManager.RemoveNode(_polygonEars[0]);
 
-
             return new SplitResult(_raisedVertexs, _concaveVertexs, _polygonEars);
         }
 
-        /// <summary>
-        /// 判断一点是否在三角形内
-        /// </summary>
-        /// <param name="p">一点</param>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <param name="c"></param>
-        /// <returns></returns>
-        public bool IsIn(Vector3 p, Vector3 a, Vector3 b, Vector3 c)
+        public bool IsInTriange(Vector3 p, Vector3 a, Vector3 b, Vector3 c)
         {
             if (p == a || p == b || p == c)
             {
@@ -241,17 +183,11 @@ namespace PolygonTool
             Vector3 t2 = Vector3.Cross(pb, pc);
             Vector3 t3 = Vector3.Cross(pc, pa);
 
-            bool isIn2 = t1.y >= 0 && t2.y >= 0 && t3.y >= 0 || t1.y <= 0 && t2.y <= 0 && t3.y <= 0;
-
-            return isIn2;
+            return t1.y >= 0 && t2.y >= 0 && t3.y >= 0 || t1.y <= 0 && t2.y <= 0 && t3.y <= 0;
         }
 
-        /// <summary>
-        /// 管理多边形 构成一个双向链表
-        /// </summary>
         public class NodeManager
         {
-
             private List<Node> _nodeList = new List<Node>();
 
             public int LinkedListLength
@@ -302,11 +238,10 @@ namespace PolygonTool
 
         public class Node
         {
-
             public int id;
             public Vector3 vertex;
             public Node lastNode;
-            
+
             public Node nextNode;
 
             public Node(int id, Vector3 vertex)
@@ -315,40 +250,23 @@ namespace PolygonTool
                 this.vertex = vertex;
             }
 
-            public Node(int id, Vector3 vertex, Node lastNode, Node nextNode)
-            {
-                this.id = id;
-                this.vertex = vertex;
-                this.lastNode = lastNode;
-                this.nextNode = nextNode;
-            }
         }
 
         public class SplitResult
         {
-            /// <summary>
-            /// 凸顶点
-            /// </summary>
-            public List<Node> raisedVertexs;
+            public List<Node> tuVert;
 
-            /// <summary>
-            /// 凹顶点
-            /// </summary>
-            public List<Node> concaveVertexs;
+            public List<Node> aoVert;
 
-            /// <summary>
-            /// 耳朵
-            /// </summary>
-            public List<Node> polygonEars;
+            public List<Node> ears;
 
             public SplitResult(List<Node> raisedVertexs, List<Node> concaveVertexs, List<Node> polygonEars)
             {
-                this.raisedVertexs = raisedVertexs;
-                this.concaveVertexs = concaveVertexs;
-                this.polygonEars = polygonEars;
+                this.tuVert = raisedVertexs;
+                this.aoVert = concaveVertexs;
+                this.ears = polygonEars;
             }
+
         }
     }
-
-    #endregion
 }
