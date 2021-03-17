@@ -306,6 +306,7 @@ namespace PolygonTool
             public int id;
             public Vector3 vertex;
             public Node lastNode;
+            
             public Node nextNode;
 
             public Node(int id, Vector3 vertex)
